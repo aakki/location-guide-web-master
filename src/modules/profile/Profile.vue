@@ -191,8 +191,7 @@ export default Vue.extend({
     },
     logout() {
       this.$store.dispatch("auth/logout");
-      this.$router.push("/login");
-      document.location.reload();
+      this.$router.push({ name: "login" });
     },
     async saveChanges() {
       try {

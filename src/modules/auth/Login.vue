@@ -1,5 +1,5 @@
 <script lang="ts">
-import Vue from "vue";
+import Vue from "vue"
 
 export default Vue.extend({
   name: "Login",
@@ -9,80 +9,110 @@ export default Vue.extend({
     email: "" as string,
     code: "" as string,
     rules: {
-      email: [
-        (v: string): boolean | string => !!v || "E-mail field is required",
-        (v: string): boolean | string =>
-          /.+@.+\..+/.test(v) || "E-mail field must be valid"
-      ],
-      code: [(v: string): boolean | string => !!v || "Code field is required!"]
-    },
-    valid: true as boolean
+      email: [] as any,
+      code: [] as any,
+    }
   }),
 
   computed: {
     existEmail(): boolean {
-      return !!this.$route.params.email;
-    }
+      console.log(this.$route.params.email)
+      return !!this.$route.params.email
+    },
   },
 
   mounted(): void {
+    console.log(this.$route.params.email)
     if (this.$route.params.email) {
-      this.email = this.$route.params.email;
+      this.email = this.$route.params.email
     }
   },
 
+  watch: {
+    email(val) {
+      this.rules = {
+        email: [],
+        code: []
+      }
+    },
+  },
+
   methods: {
-    async signUp(): Promise<any> {
-      const signUpForm: any = this.$refs.form;
-      if (await signUpForm.validate()) {
+   async signUp(): Promise<any> {
+      await this.handleRules();
+      const signUpForm: any = this.$refs.form          
+      if (signUpForm.validate()) {
         try {
-          await this.$http.post("signup", { email: this.email });
-          await this.$router.push(`login/${this.email}`);
+            const respnse1 = await this.$http.post("signup", { email: this.email })
+            console.log(respnse1,'respnse1')
+            const respnse2 = await this.$router.push(`login/${this.email}`)
+            console.log(respnse2, 'respnse2')
         } catch (e) {
           await this.$store.dispatch("alerts/show", {
             text: e,
-            color: "error"
-          });
+            color: "error",
+          })
         }
       }
     },
-    async login(): Promise<any> {
-      this.isLoading = true;
-      const signUpForm: any = this.$refs.form;
-      if (await signUpForm.validate()) {
+    async login(): Promise<any> {      
+      this.isLoading = true
+      await this.handleRules();
+      const loginForm: any = this.$refs.form
+
+      if (loginForm.validate()) {
         try {
-          this.isLoading = false;
+          this.isLoading = false
           const response = await this.$http.post("login", {
             email: this.email,
-            code: this.code
-          });
-          await this.$store.dispatch("auth/login", response.token);
-          await (this.$parent.$parent.$refs.langSwitch as any).loadLocales();
-          this.$router.push({ name: 'profile' });         
+            code: this.code,
+          })
+          const r1 = await this.$store.dispatch("auth/login", response.token)
+          console.log(r1, 'r1')
+          const r2 = await (this.$parent.$parent.$refs.langSwitch as any).loadLocales()
+          console.log(r2, 'r2')
+          this.$router.push({ name: "profile" })
         } catch (e) {
-          this.isLoading = false;
+          this.isLoading = false
           await this.$store.dispatch("alerts/show", {
-            text: 'Account not found',
-            color: "error"
-          });
+            text: "Account not found",
+            color: "error",
+          })
         }
+      }
+    },
+    async handleRules(): Promise<any> {
+      this.rules = {
+       email: [
+           (v: string): boolean | string => !!v || "E-mail field is required",
+           (v: string): boolean | string => /.+@.+\..+/.test(v) || "E-mail field must be valid",
+       ],
+       code: [(v: string): boolean | string => !!v || "Code field is required!"]
       }
     },
     handleEnterKeyUp(): void {
       if (this.existEmail) {
-        this.login();
+        this.login()
       } else {
-        this.signUp();
+        this.signUp()
       }
-    }
-  }
-});
+    },
+  },
+})
 </script>
 
 <template>
   <div>
-    <v-form ref="form" v-model="valid" lazy-validation>
-      <v-card class="login-container" flat width="325px">
+    <v-form
+      ref="form"
+      @submit.prevent="handleEnterKeyUp"
+      lazy-validation
+    >
+      <v-card
+        class="login-container"
+        flat
+        width="325px"
+      >
         <v-card-title>
           <v-row class="text-center">
             <v-col class="pa-0 pb-5 text-h4 font-weight-bold">
@@ -98,14 +128,20 @@ export default Vue.extend({
             dense
             outlined
             placeholder="Enter your email address"
-            @keyup.enter="handleEnterKeyUp"
+            @keyup.enter="signup"
           />
           <div v-if="existEmail">
             <v-row class="text-center">
-              <v-col class="text-center pt-5 pb-0" cols="12">
+              <v-col
+                class="text-center pt-5 pb-0"
+                cols="12"
+              >
                 We've just sent you a temporary login code.
               </v-col>
-              <v-col class="text-center pb-5 pt-0 " cols="12">
+              <v-col
+                class="text-center pb-5 pt-0 "
+                cols="12"
+              >
                 Please check your inbox.
               </v-col>
             </v-row>
@@ -122,7 +158,7 @@ export default Vue.extend({
               class="login-button mt-7 py-5"
               outlined
               width="100%"
-              @click="login()"
+              type="submit"
             >
               Continue with login code
             </v-btn>
@@ -132,7 +168,7 @@ export default Vue.extend({
             class="login-button mt-2 py-5 text-capitalize"
             outlined
             width="100%"
-            @click="signUp()"
+            type="submit"
           >
             Continue
           </v-btn>

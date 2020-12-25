@@ -117,10 +117,11 @@ export default Vue.extend({
           map: this.map,
           label: { text: (index + 1).toString(), color: "white" }
         });
+        this.openGoogleMap(markerCenter, location);
 
         const circle = new (await this.$google).maps.Circle({
           map: this.map,
-          clickable: false,
+          clickable: true,
           radius: area.radius,
           fillColor: "#FF9C9C",
           fillOpacity: 0.6,
@@ -128,7 +129,7 @@ export default Vue.extend({
           strokeOpacity: 1,
           strokeWeight: 2
         });
-
+        this.openGoogleMap(circle, location);
         this.markers.push({ markerCenter, circle });
 
         circle.bindTo("center", markerCenter, "position");
@@ -268,6 +269,12 @@ export default Vue.extend({
         },
         location: {}
       } as EditedLocation;
+    },
+    openGoogleMap(googleMapPointer: any, location: any):  void {
+      const that = this
+      google.maps.event.addListener(googleMapPointer, 'click', function () {
+          that.editLocation(location)
+      });
     },
     createLocation(): void {
       this.resetEditedItem();
@@ -480,7 +487,7 @@ export default Vue.extend({
             <v-list-item-content>
               <v-list-item-title
                 style="max-width: 200px;"
-                class="font-weight-bold d-inline-block text-truncate"
+                class="font-weight-bold d-inline-block text-truncate size-14"
               >
                 <span> {{ index + 1 }}. </span>
                 <span v-if="item.titleLocalized">
