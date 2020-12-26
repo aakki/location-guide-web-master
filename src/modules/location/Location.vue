@@ -48,7 +48,6 @@ export default Vue.extend({
 
   async beforeRouteEnter(to, from, next) {
     try {
-      console.log("call2");
       const locations: Array<Location> =
         (await Requests.get(`location?guideUUID=${to.params.guide_id}`)).data ||
         [];

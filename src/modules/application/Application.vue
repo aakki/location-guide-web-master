@@ -59,7 +59,7 @@ export default Vue.extend({
     try {
       const application: Application = await Requests.get(
         `application/${to.params.application_id}`
-      );
+      );      
       const guides: Array<Guide> =
         (await Requests.get(`guide?applicationUUID=${application.uuid}`))
           .data || [];
