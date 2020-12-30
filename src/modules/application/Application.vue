@@ -59,7 +59,7 @@ export default Vue.extend({
     try {
       const application: Application = await Requests.get(
         `application/${to.params.application_id}`
-      );      
+      );
       const guides: Array<Guide> =
         (await Requests.get(`guide?applicationUUID=${application.uuid}`))
           .data || [];
@@ -329,7 +329,7 @@ export default Vue.extend({
                   </v-icon>
                 </template>
                 <span
-                  >A URL with marketing information about your app. <br />
+                  >A URL with support information for your app. <br />
                   This URL will be visible on the App Store and Google
                   Play.</span
                 >
@@ -362,7 +362,7 @@ export default Vue.extend({
                   </v-icon>
                 </template>
                 <span
-                  >A URL with support information for your app. <br />
+                  >A URL with marketing information about your app. <br />
                   This URL will be visible on the App Store and Google
                   Play.</span
                 >

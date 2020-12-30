@@ -50,26 +50,47 @@ export default Vue.extend({
     }
   },
 
-  async beforeRouteEnter(to, from, next) {
-    try {
-      const user: User = await Requests.get(`user/current`);
-      const company: Company = await Requests.get(
-        `company/${user.companyUUID}`
-      );
-      const applications: Array<Application> =
-        (await Requests.get(`application`)).data || [];
+    async mounted(): Promise<any> {
+        try {
+            const user: User = await Requests.get(`user/current`);
+            const company: Company = await Requests.get(
+                `company/${user.companyUUID}`
+            );
+            const applications: Array<Application> =
+                (await Requests.get(`application`)).data || [];
 
-      next((vm: any) => {
-        vm.checkExistBreadcrumbs();
-        vm.setData(user, company, applications);
-      });
-    } catch (e) {
-      await store.dispatch("alerts/show", {
-        text: e,
-        color: "error"
-      });
-    }
+            //next((vm: any) => {
+                this.checkExistBreadcrumbs();
+                this.setData(user, company, applications);
+            //});
+        } catch (e) {
+            await store.dispatch("alerts/show", {
+                text: e,
+                color: "error"
+            });
+        }
   },
+
+  //  async beforeRouteEnter(to, from, next) {
+  //  try {
+  //    const user: User = await Requests.get(`user/current`);
+  //    const company: Company = await Requests.get(
+  //      `company/${user.companyUUID}`
+  //    );
+  //    const applications: Array<Application> =
+  //      (await Requests.get(`application`)).data || [];
+
+  //    next((vm: any) => {
+  //      vm.checkExistBreadcrumbs();
+  //      vm.setData(user, company, applications);
+  //    });
+  //  } catch (e) {
+  //    await store.dispatch("alerts/show", {
+  //      text: e,
+  //      color: "error"
+  //    });
+  //  }
+  //},
 
   async beforeRouteLeave(to, from, next) {
     if (!this.formChanged) {

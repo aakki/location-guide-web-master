@@ -50,7 +50,9 @@ export default Vue.extend({
   data: () => ({
     dialog: false as boolean,
     model: {} as object,
-    loadingMessage: "" as string
+    loadingMessage: "" as string,
+    maxImageSize: process.env.MAX_IMAZE_KB_SIZE as number,
+    maxAudioSize: process.env.MAX_AUDIO_MB_SIZE as number
   }),
 
   watch: {
@@ -83,8 +85,7 @@ export default Vue.extend({
 
         const fileSize = ((file.size / 1024));
         if (file.type.includes("image")) {
-          const maxKbLimit = 400;          
-          if (fileSize > maxKbLimit) {
+          if (fileSize > this.maxImageSize) {
             await this.$store.dispatch("alerts/show", {
               text: `File size is too big, max size is 400 KB`,
               color: "error"
@@ -96,9 +97,8 @@ export default Vue.extend({
             fileType = "Image";
           }
         } else if (file.type.includes("audio") && this.acceptAudio) {
-          const maxMbLimit = 1;
           const mbFile = fileSize / 1024;          
-          if (mbFile > maxMbLimit) {
+          if (mbFile > this.maxAudioSize) {
             await this.$store.dispatch("alerts/show", {
               text: `File size is too big, max size is 1 MB`,
               color: "error"

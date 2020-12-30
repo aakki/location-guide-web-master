@@ -55,7 +55,6 @@ export default Vue.extend({
       this.isLoading = true
       await this.handleRules();
       const loginForm: any = this.$refs.form
-
       if (loginForm.validate()) {
         try {
           this.isLoading = false
