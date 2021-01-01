@@ -87,7 +87,7 @@ export default Vue.extend({
         if (file.type.includes("image")) {
           if (fileSize > this.maxImageSize) {
             await this.$store.dispatch("alerts/show", {
-              text: `File size is too big, max size is 400 KB`,
+              text: `File size is too big, max size is 400KB`,
               color: "error"
             });
             return; 
