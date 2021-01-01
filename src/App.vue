@@ -66,8 +66,6 @@ export default Vue.extend({
 </template>
 
 <style lang="scss" scoped>
-
-
 .router-view {
   margin-top: 54px !important;
 }

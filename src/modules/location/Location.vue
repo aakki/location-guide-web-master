@@ -6,6 +6,7 @@ import { Area } from "@/interfaces/Area";
 import { Location } from "@/interfaces/Location";
 import draggable from "vuedraggable";
 import Requests from "@/services/api/Requests";
+import { mount } from '@vue/test-utils';
 
 interface EditedLocation {
   area: Area;
@@ -46,26 +47,45 @@ export default Vue.extend({
     }
   },
 
-  async beforeRouteEnter(to, from, next) {
-    try {
-      console.log("call2");
-      const locations: Array<Location> =
-        (await Requests.get(`location?guideUUID=${to.params.guide_id}`)).data ||
-        [];
-      next((vm: any) => {
-        vm.checkExistBreadcrumbs();
-        vm.setData(locations);
-        vm.$nextTick(() => {
-          vm.loadMap();
-        });
-      });
-    } catch (e) {
-      await store.dispatch("alerts/show", {
-        text: e,
-        color: "error"
-      });
-    }
-  },
+    async mounted(): Promise<any> {
+        try {
+            const locations: Array<Location> =
+                (await Requests.get(`location?guideUUID=${this.$route.params.guide_id}`)).data ||
+                [];
+            //next((vm: any) => {
+            this.checkExistBreadcrumbs();
+            this.setData(locations);
+            this.$nextTick(() => {
+                this.loadMap();
+                });
+            //});
+        } catch (e) {
+            await store.dispatch("alerts/show", {
+                text: e,
+                color: "error"
+            });
+        }
+    },
+
+  //async beforeRouteEnter(to, from, next) {
+  //  try {
+  //    const locations: Array<Location> =
+  //      (await Requests.get(`location?guideUUID=${to.params.guide_id}`)).data ||
+  //      [];
+  //    next((vm: any) => {
+  //      vm.checkExistBreadcrumbs();
+  //      vm.setData(locations);
+  //      vm.$nextTick(() => {
+  //        vm.loadMap();
+  //      });
+  //    });
+  //  } catch (e) {
+  //    await store.dispatch("alerts/show", {
+  //      text: e,
+  //      color: "error"
+  //    });
+  //  }
+  //},
 
   methods: {
     async loadMap(): Promise<void> {

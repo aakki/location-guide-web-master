@@ -50,7 +50,9 @@ export default Vue.extend({
   data: () => ({
     dialog: false as boolean,
     model: {} as object,
-    loadingMessage: "" as string
+    loadingMessage: "" as string,
+    maxImageSize: process.env.MAX_IMAZE_KB_SIZE as number,
+    maxAudioSize: process.env.MAX_AUDIO_MB_SIZE as number
   }),
 
   watch: {
@@ -67,7 +69,6 @@ export default Vue.extend({
     if (!this.noModal) {
       this.dialog = this.value;
     }
-    console.log(this.dialog);
   },
 
   methods: {
@@ -77,12 +78,38 @@ export default Vue.extend({
     },
     async uploadFile(file: any): Promise<any> {
       this.loadingMessage = "";
-
+      
       try {
         const form: FormData = new FormData();
         let fileType = "";
 
-        form.append("file", file);
+        const fileSize = ((file.size / 1024));
+        if (file.type.includes("image")) {
+          if (fileSize > this.maxImageSize) {
+            await this.$store.dispatch("alerts/show", {
+              text: `File size is too big, max size is 400KB`,
+              color: "error"
+            });
+            return; 
+          } else {
+            form.append("file", file);
+            form.append("fileType", "0");
+            fileType = "Image";
+          }
+        } else if (file.type.includes("audio") && this.acceptAudio) {
+          const mbFile = fileSize / 1024;          
+          if (mbFile > this.maxAudioSize) {
+            await this.$store.dispatch("alerts/show", {
+              text: `File size is too big, max size is 1 MB`,
+              color: "error"
+            });
+            return;
+          } else {
+            form.append("file", file);
+            form.append("fileType", "1");
+            fileType = "Audio";
+          }
+        }
 
         if (this.locationId) {
           form.append("locationUUID", this.locationId.toString());
@@ -90,22 +117,6 @@ export default Vue.extend({
 
         if (this.guideId) {
           form.append("guideUUID", this.guideId.toString());
-        }
-
-        if (file.type.includes("image")) {
-          form.append("fileType", "0");
-          fileType = "Image";
-        } else if (file.type.includes("audio") && this.acceptAudio) {
-          form.append("fileType", "1");
-          fileType = "Audio";
-        } else {
-          await this.$store.dispatch("alerts/show", {
-            text: `Please select ${
-              this.acceptAudio ? "audio or" : ""
-            } image file`,
-            color: "error"
-          });
-          return;
         }
 
         if (!this.skipQuery) {
@@ -151,7 +162,7 @@ export default Vue.extend({
     },
     drop(event: any): void {
       event.preventDefault();
-      (this.$refs.file as any).files = event.dataTransfer.files;
+      (this.$refs.file as any).files = event.dataTransfer.files;      
       this.getFile();
       event.currentTarget.classList.remove("drop-over");
     },

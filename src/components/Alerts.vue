@@ -25,6 +25,14 @@ export default Vue.extend({
             setTimeout(() => {
               this.hide();
             }, 4000);
+          } else if (
+            this.message &&
+            this.message.text &&
+            this.message.text.includes("Image file was uploaded successfully!")
+          ) {
+            setTimeout(() => {
+              this.hide();
+            }, 4000);
           }
         }
       } catch {

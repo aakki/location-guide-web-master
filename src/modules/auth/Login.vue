@@ -16,13 +16,11 @@ export default Vue.extend({
 
   computed: {
     existEmail(): boolean {
-      console.log(this.$route.params.email)
       return !!this.$route.params.email
     },
   },
 
   mounted(): void {
-    console.log(this.$route.params.email)
     if (this.$route.params.email) {
       this.email = this.$route.params.email
     }
@@ -43,10 +41,8 @@ export default Vue.extend({
       const signUpForm: any = this.$refs.form          
       if (signUpForm.validate()) {
         try {
-            const respnse1 = await this.$http.post("signup", { email: this.email })
-            console.log(respnse1,'respnse1')
-            const respnse2 = await this.$router.push(`login/${this.email}`)
-            console.log(respnse2, 'respnse2')
+            await this.$http.post("signup", { email: this.email })
+            await this.$router.push(`login/${this.email}`)
         } catch (e) {
           await this.$store.dispatch("alerts/show", {
             text: e,
@@ -59,7 +55,6 @@ export default Vue.extend({
       this.isLoading = true
       await this.handleRules();
       const loginForm: any = this.$refs.form
-
       if (loginForm.validate()) {
         try {
           this.isLoading = false
@@ -67,11 +62,11 @@ export default Vue.extend({
             email: this.email,
             code: this.code,
           })
-          const r1 = await this.$store.dispatch("auth/login", response.token)
-          console.log(r1, 'r1')
-          const r2 = await (this.$parent.$parent.$refs.langSwitch as any).loadLocales()
-          console.log(r2, 'r2')
-          this.$router.push({ name: "profile" })
+          await this.$store.dispatch("auth/login", response.token)
+          await (this.$parent.$parent.$refs.langSwitch as any).loadLocales()
+          await this.$router.push(`/`);
+          document.location.reload();
+          //this.$router.push({ name: "profile" })
         } catch (e) {
           this.isLoading = false
           await this.$store.dispatch("alerts/show", {

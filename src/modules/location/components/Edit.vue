@@ -392,19 +392,7 @@ export default Vue.extend({
             <lang-switcher
               @save="saveBeforeLangChange"
               with-confirm
-            ></lang-switcher>
-            <v-btn
-              v-if="!createMode"
-              v-confirm="{
-                title: 'Delete confirm',
-                message: 'Delete edited location?',
-                callback: () => changeData('delete', true)
-              }"
-              class="red--text text-lowercase delete-btn"
-              text
-            >
-              delete
-            </v-btn>
+            ></lang-switcher>            
           </v-row>
         </v-card-title>
         <v-card-text class="edit-content">
@@ -612,6 +600,21 @@ export default Vue.extend({
             </v-row>
           </v-form>
         </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            v-if="!createMode"
+            v-confirm="{
+              title: 'Delete confirm',
+              message: 'Delete edited location?',
+              callback: () => changeData('delete', true)
+            }"
+            class="red--text delete-btn"
+            text
+          >
+            Delete location
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
     <file-uploader
